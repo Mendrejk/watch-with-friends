@@ -1,0 +1,1 @@
+& .\_kubernetes\minikube_start.ps1

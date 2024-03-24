@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat
+spec:
+  selector:
+    matchLabels:
+      app: chat
+      tier: chat
+      track: stable
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: chat
+        tier: chat
+        track: stable
+    spec:
+      containers:
+        - name: chat
+          image: backend_chat
+          env:
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_USER
+              value: root
+            - name: POSTGRES_HOST
+              value: chat-db-service
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: db
+            - name: KAFKA_SERVER   
+              value: kafka-service:9092
+            - name: KAFKA_GROUP_ID   
+              value: chat
+          ports:
+            - name: http
+              containerPort: 8000
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          imagePullPolicy: IfNotPresent

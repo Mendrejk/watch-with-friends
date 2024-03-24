@@ -1,0 +1,20 @@
+services:
+  rooms:
+    image: backend_rooms
+    build:
+      context: ./rooms
+  
+  users:
+    image: backend_users
+    build: 
+      context: ./users
+
+  chat:
+    image: backend_chat
+    build:
+      context: ./chat
+
+  videos:
+    image: backend_videos
+    build:
+      context: ./videos

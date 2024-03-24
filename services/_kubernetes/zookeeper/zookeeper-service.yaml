@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-service
+spec:
+  selector:
+    app: zookeeper
+    tier: zookeeper
+  ports:
+  - protocol: TCP
+    port: 2181

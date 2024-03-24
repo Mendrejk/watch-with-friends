@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users
+spec:
+  selector:
+    matchLabels:
+      app: users
+      tier: users
+      track: stable
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: users
+        tier: users
+        track: stable
+    spec:
+      containers:
+        - name: users
+          image: backend_users
+          env:
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_USER
+              value: root
+            - name: POSTGRES_HOST
+              value: users-db-service
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_DB
+              value: db
+            - name: KAFKA_SERVER   
+              value: kafka-service:9092
+            - name: KAFKA_GROUP_ID   
+              value: users
+          ports:
+            - name: http
+              containerPort: 8000
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          imagePullPolicy: IfNotPresent

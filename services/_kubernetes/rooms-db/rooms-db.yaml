@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rooms-db
+spec:
+  selector:
+    matchLabels:
+      app: rooms-db
+      tier: rooms-db
+      track: stable
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rooms-db
+        tier: rooms-db
+        track: stable
+    spec:
+      containers:
+        - name: rooms-db
+          image: postgres
+          env:
+          - name: POSTGRES_PASSWORD
+            value: "password"
+          - name: POSTGRES_USER
+            value: "root"
+          - name: POSTGRES_DB
+            value: "db"
+          ports:
+            - name: http
+              containerPort: 5432
+          volumeMounts:
+          - name: rooms-db-volume
+            mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+      volumes:
+      - name: rooms-db-volume
+        persistentVolumeClaim:
+          claimName: rooms-db-volume-claim
