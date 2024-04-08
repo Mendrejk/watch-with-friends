@@ -130,6 +130,7 @@ export default function Page({ params }) {
                 setTimeout(() => { setAssumeLeader(false) }, 1000);
                 DefaultService.playRoomRoomIdPlayPost(params.id)
                 setIsPlaying(true)
+                // TODO: On pause/play - ask leader for their progress and synchronize with all users
             }}
             onPause={() => {
                 console.log(" Setting pause")
