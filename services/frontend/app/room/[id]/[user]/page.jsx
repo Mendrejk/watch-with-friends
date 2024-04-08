@@ -3,17 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { DefaultService } from "@/services/openapi/rooms"
 import { OpenAPI } from "@/services/openapi/rooms"
-import { redirect } from "next/navigation";
-import { useRouter } from 'next/navigation'
 import React from "react";
 import ReactPlayer from 'react-player'
+import { backend_url, backend_ws_url } from "@/app/backend";
 
-OpenAPI.BASE = "http://localhost/api/rooms"
-const backend = "localhost"
+OpenAPI.BASE = `${backend_url}/api/rooms`
 
 export default function Page({ params }) {
-
-
 
     let ws = null;
 
@@ -24,7 +20,10 @@ export default function Page({ params }) {
     const [amIOwner, setAmIOwner] = useState(false)
 
     const [url, setUrl] = useState('')
+
     const [isPlaying, setIsPlaying] = useState(false)
+    const [assumeLeader, setAssumeLeader] = useState(false)
+
     const [progress, setProgress] = useState(0)
 
     const [serverProgress, setServerProgress] = useState(0)
@@ -33,19 +32,11 @@ export default function Page({ params }) {
     const player = useRef(null);
 
     useEffect(() => {
-        DefaultService.readRoomRoomRoomIdGet(params.id).then((data) => {
-            setRoom(data.room)
-        })
-        DefaultService.readRoomUsersRoomRoomIdUsersGet(params.id).then((data) => {
-            setUsers(data.users)
-        })
-        DefaultService.readRoomOwnerRoomRoomIdOwnerGet(params.id).then((data) => {
-            setOwner(data.owner)
-        })
-        // DefaultService.joinRoomRoomRoomIdJoinUserNamePost(params.id, '1337').then((data) => {
-        //     console.log(data)
-        // })
-        ws = new WebSocket('ws://' + backend + '/api/rooms/ws');
+        DefaultService.readRoomRoomRoomIdGet(params.id).then((data) => { setRoom(data.room) })
+        DefaultService.readRoomUsersRoomRoomIdUsersGet(params.id).then((data) => { setUsers(data.users) })
+        DefaultService.readRoomOwnerRoomRoomIdOwnerGet(params.id).then((data) => { setOwner(data.owner) })
+
+        ws = new WebSocket(`${backend_ws_url}/api/rooms/ws`);
         ws.addEventListener("message", (event) => {
             let rooms = JSON.parse(event.data)
             let myRoom = rooms[params.id]
@@ -63,14 +54,16 @@ export default function Page({ params }) {
                 setProgress(serverProgress)
                 player.current.seekTo(serverProgress)
             }
+        }
 
+        if (player.current && !assumeLeader) {
             if (isPlaying !== serverIsPlaying) {
-                console.log("xd")
+                console.log("Setting playing from server" + serverIsPlaying)
                 setIsPlaying(serverIsPlaying)
-
             }
         }
-    }, [player, amIOwner, progress, serverProgress, isPlaying, serverIsPlaying])
+
+    }, [player, amIOwner, progress, serverProgress, isPlaying, serverIsPlaying, assumeLeader])
 
     useEffect(() => {
         if (me == owner[0]) {
@@ -80,58 +73,71 @@ export default function Page({ params }) {
 
     useEffect(() => {
         if (amIOwner) {
-            if (isPlaying) {
-                console.log(" Setting play")
-                DefaultService.playRoomRoomIdPlayPost(params.id)
-            } else {
-                console.log(" Setting pause")
-                DefaultService.pauseRoomRoomIdPausePost(params.id)
-            }
-
             DefaultService.setProgressRoomRoomIdSetProgressProgressPost(params.id, parseInt(progress), me)
         }
-    }, [amIOwner, isPlaying, progress]);
-
-    useEffect(() => {
-        console.log("DUPA:" + isPlaying)
-    }, [isPlaying])
-
+    }, [amIOwner, progress]);
 
 
     if (!room) return (<div>Loading...</div>)
     if (!users) return (<div>Loading...</div>)
 
     return (<>
-        <div>Room: {params.id}</div>
-        <div>{room.name}</div>
-        <div>{room.owner}</div>
-        <br></br>
+        <div>
+            Room: {params.id} <br></br>
+            Name: {room.name}<br></br>
+            Owner {room.owner[0]} - {room.owner[1]}<br></br>
+        </div>
+
+        <hr></hr>
+
         <div>Users:</div>
         <ul>
             {users.map((user) => (
                 <li key={user[0]}>{user[0]} - {user[1]}</li>
             ))}
         </ul>
-        <br></br>
-        <div>Owner:</div>
-        <div>{owner[0]} - {owner[1]}</div>
 
-        <div>Playback</div>
-        <div>{String(isPlaying)}</div>
-        <div>{progress}</div>
-        <br></br>
+        <hr></hr>
 
-        <div>Server Playback</div>
-        <div>{String(serverIsPlaying)}</div>
-        <div>{serverProgress}</div>
+        <div>
+            Owner: {owner[0]} - {owner[1]}
+            {amIOwner && <div>I am owner</div>}
+        </div>
 
 
-        {amIOwner && <div>I am owner</div>}
+        <hr></hr>
+
+
+        <div className="flex justify-around">
+            <div>
+                Playback <br></br>
+                {String(isPlaying)} <br></br>
+                {progress} <br></br>
+            </div>
+
+            <div>
+                Server Playback <br></br>
+                {String(serverIsPlaying)} <br></br>
+                {serverProgress} <br></br>
+            </div>
+        </div>
 
         <ReactPlayer
             url='https://www.youtube.com/watch?v=LXb3EKWsInQ'
-            onPlay={() => setIsPlaying(true)}
-            onPause={() => setIsPlaying(false)}
+            onPlay={() => {
+                console.log(" Setting play")
+                setAssumeLeader(true)
+                setTimeout(() => { setAssumeLeader(false) }, 1000);
+                DefaultService.playRoomRoomIdPlayPost(params.id)
+                setIsPlaying(true)
+            }}
+            onPause={() => {
+                console.log(" Setting pause")
+                setAssumeLeader(true)
+                setTimeout(() => { setAssumeLeader(false) }, 1000);
+                DefaultService.pauseRoomRoomIdPausePost(params.id)
+                setIsPlaying(false)
+            }}
             onProgress={(x) => setProgress(x.playedSeconds)}
             controls={true}
             playing={isPlaying}
