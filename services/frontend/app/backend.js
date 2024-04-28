@@ -1,2 +1,2 @@
-export let backend_url = "http://minikube.pl";
-export let backend_ws_url = "ws://minikube.pl";
+export let backend_url = "http://localhost:2137";
+export let backend_ws_url = "ws://localhost:2137";
