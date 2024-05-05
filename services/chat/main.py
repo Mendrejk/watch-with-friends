@@ -39,8 +39,14 @@ async def read_root():
 
 
 @app.get("/rooms")
-async def read_item():
+async def read_rooms():
     return {"rooms": repository.get_rooms()}
+
+
+@app.get('/room/{room_id}')
+async def read_room(room_id: str):
+    return {'room': repository.get_room(room_id)}
+
 
 @app.get("/testdb")
 async def read_item():

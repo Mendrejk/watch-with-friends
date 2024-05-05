@@ -20,6 +20,7 @@ export default function Page({ params }) {
     const [me, setMe] = useState(params.user)
     const [room, setRoom] = useState(null)
     const [users, setUsers] = useState([])
+    const [chat, setChat] = useState([])
     const [owner, setOwner] = useState('')
     const [amIOwner, setAmIOwner] = useState(false)
 
@@ -82,7 +83,7 @@ export default function Page({ params }) {
     }, [amIOwner, progress]);
 
     useEffect(() => {
-        let chats = DefaultServiceChat.readItemRoomsGet().then((data) => {
+        let chats = DefaultServiceChat.readRoomsRoomsGet().then((data) => {
             console.log(data)
         })
     }, [])

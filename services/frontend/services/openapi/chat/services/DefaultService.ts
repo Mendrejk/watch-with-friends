@@ -18,14 +18,34 @@ export class DefaultService {
         });
     }
     /**
-     * Read Item
+     * Read Rooms
      * @returns any Successful Response
      * @throws ApiError
      */
-    public static readItemRoomsGet(): CancelablePromise<any> {
+    public static readRoomsRoomsGet(): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/rooms',
+        });
+    }
+    /**
+     * Read Room
+     * @param roomId
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static readRoomRoomRoomIdGet(
+        roomId: string,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/room/{room_id}',
+            path: {
+                'room_id': roomId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
         });
     }
     /**
