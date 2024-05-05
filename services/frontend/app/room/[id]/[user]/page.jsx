@@ -7,7 +7,11 @@ import React from "react";
 import ReactPlayer from 'react-player'
 import { backend_url, backend_ws_url } from "@/app/backend";
 
+import { DefaultService as DefaultServiceChat } from "@/services/openapi/chat"
+import {OpenAPI as OpenAPIChat} from "@/services/openapi/chat"
+
 OpenAPI.BASE = `${backend_url}/api/rooms`
+OpenAPIChat.BASE = `${backend_url}/api/chat`
 
 export default function Page({ params }) {
 
@@ -76,6 +80,12 @@ export default function Page({ params }) {
             DefaultService.setProgressRoomRoomIdSetProgressProgressPost(params.id, parseInt(progress), me)
         }
     }, [amIOwner, progress]);
+
+    useEffect(() => {
+        let chats = DefaultServiceChat.readItemRoomsGet().then((data) => {
+            console.log(data)
+        })
+    }, [])
 
 
     if (!room) return (<div>Loading...</div>)
