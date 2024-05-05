@@ -1,7 +1,7 @@
 import asyncio
 import json
 import os
-from typing import List, Union
+from typing import Any
 from fastapi import FastAPI
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 
@@ -17,7 +17,7 @@ def encode_json(msg):
     to_load = msg.value.decode('utf-8')
     return json.loads(to_load)
 
-async def send_one(topic: str, msg: List):
+async def send_one(topic: str, msg: Any):
     try:
         producer = AIOKafkaProducer(
             bootstrap_servers=kafka_bootstrap_servers
