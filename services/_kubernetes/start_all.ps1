@@ -43,3 +43,7 @@ kubectl apply -f kong/videos_route.yaml
 kubectl apply -f kong/chat_route.yaml
 kubectl apply -f kong/rooms_route.yaml
 kubectl apply -f kong/users_route.yaml
+kubectl apply -f kong/frontend_route.yaml
+
+kubectl apply -f frontend/frontend.yaml
+kubectl apply -f frontend/frontend-service.yaml

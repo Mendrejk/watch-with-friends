@@ -80,8 +80,8 @@ export default function Page({params}) {
             for (let i = 0; i < chat.size; i++) {
                 messages.push(chat[i])
             }
-            setChat(chat)
-            console.log(typeof(chat))
+            // setChat(chat)
+            // console.log(typeof(chat))
         });
     }, [])
 

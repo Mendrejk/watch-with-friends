@@ -38,3 +38,7 @@ kubectl delete -f kong/videos_route.yaml
 kubectl delete -f kong/chat_route.yaml
 kubectl delete -f kong/rooms_route.yaml
 kubectl delete -f kong/users_route.yaml
+kubectl delete -f kong/frontend_route.yaml
+
+kubectl delete -f frontend/frontend.yaml
+kubectl delete -f frontend/frontend-service.yaml

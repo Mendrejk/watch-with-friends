@@ -10,7 +10,7 @@ OpenAPI.BASE = `${backend_url}/api/rooms`
 const admin_user = "1337"
 const normal_user = "jan"
 
-export function RoomListWithAdd({ rooms, onRoomClick, onAddRoom }) {
+function RoomListWithAdd({ rooms, onRoomClick, onAddRoom }) {
   let [newRoomName, setNewRoomName] = useState("")
   return (
     <div>
@@ -26,7 +26,7 @@ export function RoomListWithAdd({ rooms, onRoomClick, onAddRoom }) {
   )
 }
 
-export function Room({ room }) {
+function Room({ room }) {
   return (
     <div>
       <h1>{room.name}</h1>
@@ -60,18 +60,18 @@ export default function Home() {
 
   return (
     <>
-    <div className="flex justify-center gap-4">
-    <RoomListWithAdd
-        rooms={rooms}
-        onRoomClick={(room) => { router.push("/room/" + room.id + "/" + admin_user) }}
-        onAddRoom={(name) => onAddRoom(name, admin_user)} />
+      <div className="flex justify-center gap-4">
+        <RoomListWithAdd
+          rooms={rooms}
+          onRoomClick={(room) => { router.push("/room/" + room.id + "/" + admin_user) }}
+          onAddRoom={(name) => onAddRoom(name, admin_user)} />
 
-      <RoomListWithAdd
-        rooms={rooms}
-        onRoomClick={(room) => { router.push("/room/" + room.id + "/" + normal_user) }}
-        onAddRoom={(name) => onAddRoom(name, normal_user)} />
-    </div>
-     
+        <RoomListWithAdd
+          rooms={rooms}
+          onRoomClick={(room) => { router.push("/room/" + room.id + "/" + normal_user) }}
+          onAddRoom={(name) => onAddRoom(name, normal_user)} />
+      </div>
+
     </>
   )
 }

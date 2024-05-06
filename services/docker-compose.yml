@@ -18,3 +18,8 @@ services:
     image: backend_videos
     build:
       context: ./videos
+
+  frontend:
+    image: frontend
+    build:
+      context: ./frontend
