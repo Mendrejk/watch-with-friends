@@ -114,6 +114,25 @@ export default function Page({params}) {
         }
     }, [amIOwner, progress]);
 
+    useEffect(() => {
+    const interval = setInterval(() => {
+        DefaultServiceChat.readRoomRoomRoomIdGet(params.id).then((data) => {
+            if (data.room) {
+                setChat(data.room)
+            } else {
+                DefaultServiceChat.createRoomCreateRoomRoomIdPost(params.id).then((data) => {
+                    setChat(data.room)
+                })
+            }
+        })
+    }, 100); // Fetch chat messages every 100ms
+
+    // Clean up function
+    return () => {
+        clearInterval(interval);
+    };
+}, [params.id]); // Re-run the effect when `params.id` changes
+
     if (!room) return (<div>Loading...</div>)
     if (!users) return (<div>Loading...</div>)
     if (!chat) return (<div>Loading...</div>)
