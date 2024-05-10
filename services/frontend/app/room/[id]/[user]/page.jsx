@@ -1,19 +1,19 @@
 'use client'
 
-import {useEffect, useRef, useState} from "react";
-import {DefaultService} from "@/services/openapi/rooms"
-import {OpenAPI} from "@/services/openapi/rooms"
+import { useEffect, useRef, useState } from "react";
+import { DefaultService } from "@/services/openapi/rooms"
+import { OpenAPI } from "@/services/openapi/rooms"
 import React from "react";
 import ReactPlayer from 'react-player'
-import {backend_url, backend_ws_url} from "@/app/backend";
+import { backend_url, backend_ws_url } from "@/app/backend";
 
-import {DefaultService as DefaultServiceChat} from "@/services/openapi/chat"
-import {OpenAPI as OpenAPIChat} from "@/services/openapi/chat"
+import { DefaultService as DefaultServiceChat } from "@/services/openapi/chat"
+import { OpenAPI as OpenAPIChat } from "@/services/openapi/chat"
 
 OpenAPI.BASE = `${backend_url}/api/rooms`
 OpenAPIChat.BASE = `${backend_url}/api/chat`
 
-export default function Page({params}) {
+export default function Page({ params }) {
 
     let ws = null;
     let chat_ws = null;
@@ -115,23 +115,23 @@ export default function Page({params}) {
     }, [amIOwner, progress]);
 
     useEffect(() => {
-    const interval = setInterval(() => {
-        DefaultServiceChat.readRoomRoomRoomIdGet(params.id).then((data) => {
-            if (data.room) {
-                setChat(data.room)
-            } else {
-                DefaultServiceChat.createRoomCreateRoomRoomIdPost(params.id).then((data) => {
+        const interval = setInterval(() => {
+            DefaultServiceChat.readRoomRoomRoomIdGet(params.id).then((data) => {
+                if (data.room) {
                     setChat(data.room)
-                })
-            }
-        })
-    }, 100); // Fetch chat messages every 100ms
+                } else {
+                    DefaultServiceChat.createRoomCreateRoomRoomIdPost(params.id).then((data) => {
+                        setChat(data.room)
+                    })
+                }
+            })
+        }, 100); // Fetch chat messages every 100ms
 
-    // Clean up function
-    return () => {
-        clearInterval(interval);
-    };
-}, [params.id]); // Re-run the effect when `params.id` changes
+        // Clean up function
+        return () => {
+            clearInterval(interval);
+        };
+    }, [params.id]); // Re-run the effect when `params.id` changes
 
     if (!room) return (<div>Loading...</div>)
     if (!users) return (<div>Loading...</div>)
@@ -209,7 +209,7 @@ export default function Page({params}) {
 
             <div className="mt-5 flex flex-col items-center">
                 <input className="w-full" type="text" value={newMessage}
-                       onChange={(event) => setNewMessage(event.target.value)}></input>
+                    onChange={(event) => setNewMessage(event.target.value)}></input>
                 <button className="w-24" onClick={() => {
                     setNewMessage('')
                     DefaultServiceChat.addMessageRoomRoomIdAddMessageMessageUserNamePost(params.id, newMessage, me).then((data) => {

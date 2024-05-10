@@ -17,7 +17,15 @@ export default function Home() {
   const [userName, setUserName] = useState("");
   const [userRole, setUserRole] = useState("NewUser");
 
-  useEffect(() => { fetchRooms() }, []);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchRooms();
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   let fetchRooms = () => {
     DefaultService.readRoomsRoomsGet().then((data) => {
