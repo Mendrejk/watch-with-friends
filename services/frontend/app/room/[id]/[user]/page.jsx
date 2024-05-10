@@ -109,6 +109,28 @@ export default function Page({ params }) {
     }, [owner])
 
     useEffect(() => {
+        const handleWindowClose = (event) => {
+            if (me == owner[1]) {
+
+                const confirmationMessage = 'Are you sure you want to leave?';
+                event.returnValue = confirmationMessage;
+
+                DefaultService.deleteRoomDeleteRoomRoomIdDelete(params.id).then(() => {
+                    console.log("Room deleted");
+                }).catch((error) => {
+                    console.error("Error deleting room:", error);
+                });
+            }
+        };
+
+        window.addEventListener("beforeunload", handleWindowClose);
+
+        return () => {
+            window.removeEventListener("beforeunload", handleWindowClose);
+        };
+    }, [params.id, owner, room]);
+
+    useEffect(() => {
         if (amIOwner) {
             DefaultService.setProgressRoomRoomIdSetProgressProgressPost(params.id, parseInt(progress), me)
         }
