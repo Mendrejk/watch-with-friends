@@ -164,14 +164,14 @@ export default function Page({ params }) {
     useEffect(() => {
         // Fetch video URL from the server when the component mounts
         DefaultService.readVideoRoomRoomIdVideoGet(params.id).then((data) => {
-          if (data.url) {
+          if (data.video.url) {
             // If video URL is retrieved successfully, set it in the state
-            setUrl(data.url);
+            setUrl(data.video.url);
           } else {
             console.error("Video URL not found");
           }
         });
-      }, [url, params.id]);
+      }, [params.id]);
 
     if (!room) return (<div>Loading...</div>)
     if (!users) return (<div>Loading...</div>)
@@ -217,7 +217,7 @@ export default function Page({ params }) {
                 DefaultService.setVideoRoomRoomIdSetVideoVideoUrlUserIdPost(params.id, inputUrl, me);
               }}
             >
-              Play
+              Set
             </button>
           </div>
         )}
