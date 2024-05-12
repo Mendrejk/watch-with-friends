@@ -75,13 +75,20 @@ export default function Page({params}) {
 
         chat_ws = new WebSocket(`${backend_ws_url}/api/chat/ws/${params.id}`);
         chat_ws.addEventListener("message", (event) => {
-            let chat = JSON.parse(event.data)
+            let chat_object = JSON.parse(event.data)
             let messages = []
-            for (let i = 0; i < chat.size; i++) {
-                messages.push(chat[i])
+            for (let i = 0; i < chat_object.length; i++) {
+                let message_array = chat_object[i]
+                messages.push({
+                    user_name: message_array[0],
+                    message: message_array[1]
+                })
             }
-            // setChat(chat)
-            // console.log(typeof(chat))
+            let chat = {
+                id: 'todo',
+                messages: messages
+            }
+            setChat(chat)
         });
     }, [])
 
