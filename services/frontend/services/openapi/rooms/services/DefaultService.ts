@@ -10,12 +10,14 @@ export class DefaultService {
      * Create Room
      * @param roomName
      * @param ownerName
+     * @param ownerId
      * @returns any Successful Response
      * @throws ApiError
      */
     public static createRoomCreateRoomRoomNameOwnerNamePost(
         roomName: string,
         ownerName: string,
+        ownerId: string,
     ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -23,6 +25,9 @@ export class DefaultService {
             path: {
                 'room_name': roomName,
                 'owner_name': ownerName,
+            },
+            query: {
+                'owner_id': ownerId,
             },
             errors: {
                 422: `Validation Error`,
@@ -113,12 +118,14 @@ export class DefaultService {
      * Join Room
      * @param roomId
      * @param userName
+     * @param userId
      * @returns any Successful Response
      * @throws ApiError
      */
     public static joinRoomRoomRoomIdJoinUserNamePost(
         roomId: string,
         userName: string,
+        userId: string,
     ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -126,6 +133,9 @@ export class DefaultService {
             path: {
                 'room_id': roomId,
                 'user_name': userName,
+            },
+            query: {
+                'user_id': userId,
             },
             errors: {
                 422: `Validation Error`,

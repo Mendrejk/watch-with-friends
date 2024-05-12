@@ -18,7 +18,8 @@ export default function Page({ params }) {
     let ws = null;
     let chat_ws = null;
 
-    const [me, setMe] = useState(params.user)
+    const me = params.userId
+    const userName = params.userName
     const [room, setRoom] = useState(null)
     const [users, setUsers] = useState([])
     const [chat, setChat] = useState([])
@@ -234,7 +235,7 @@ export default function Page({ params }) {
                     onChange={(event) => setNewMessage(event.target.value)}></input>
                 <button className="w-24" onClick={() => {
                     setNewMessage('')
-                    DefaultServiceChat.addMessageRoomRoomIdAddMessageMessageUserNamePost(params.id, newMessage, me).then((data) => {
+                    DefaultServiceChat.addMessageRoomRoomIdAddMessageMessageUserNamePost(params.id, newMessage, userName).then((data) => {
                         setChat(data.room)
                     })
                 }}>Send
