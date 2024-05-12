@@ -75,6 +75,6 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
     while True:
         room = repository.get_room(room_id)
         if room:
-            messages = {x: (room.messages[x].user_name, room.messages[x].message) for x in range(len(room.messages))}
+            messages = [(room.messages[x].user_name, room.messages[x].message) for x in range(len(room.messages))]
             await websocket.send_text(json.dumps(messages))
         await asyncio.sleep(0.1)

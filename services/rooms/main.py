@@ -25,9 +25,8 @@ postgress_handler.add_demo_data()
 
 
 @app.post('/create_room/{room_name}/{owner_name}')
-async def create_room(room_name: str, owner_name: str):
+async def create_room(room_name: str, owner_name: str, owner_id: str):
     room_id = str(uuid.uuid4())
-    owner_id = str(uuid.uuid4())
 
     repository.add_room(
         Room(id=room_id, name=room_name, owner=(owner_id, owner_name), users=[], status=RoomStatus.NO_VIDEO,
@@ -60,11 +59,10 @@ async def read_room_users(room_id: str):
     return {'users': room.users}
 
 
-# TODO: in the future we should probably use id from user service instead of generating one
+# TODO: in the future we should probably use id from user service instead of taking one from the request
 @app.post('/room/{room_id}/join/{user_name}')
-async def join_room(room_id: str, user_name: str):
+async def join_room(room_id: str, user_name: str, user_id: str):
     room = repository.get_room(room_id)
-    user_id = str(uuid.uuid4())
     room.users.append((user_id, user_name))
     await kafka_handler.send_one('main_topic', ('user_joined', room_id, user_id))
     return {'user_id': user_id, 'room': room}
