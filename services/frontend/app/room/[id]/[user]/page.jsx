@@ -28,6 +28,7 @@ export default function Page({ params }) {
     const [newMessage, setNewMessage] = useState('')
 
     const [url, setUrl] = useState('')
+    const [inputUrl, setInputUrl] = useState('');
 
     const [isPlaying, setIsPlaying] = useState(false)
     const [assumeLeader, setAssumeLeader] = useState(false)
@@ -38,6 +39,11 @@ export default function Page({ params }) {
     const [serverIsPlaying, setServerIsPlaying] = useState(false)
 
     const player = useRef(null);
+
+
+    const handleInputURLChange = (event) => {
+        setInputUrl(event.target.value);
+    };
 
     useEffect(() => {
         DefaultService.readRoomRoomRoomIdGet(params.id).then((data) => {
@@ -103,7 +109,7 @@ export default function Page({ params }) {
     }, [player, amIOwner, progress, serverProgress, isPlaying, serverIsPlaying, assumeLeader])
 
     useEffect(() => {
-        if (me == owner[0]) {
+        if (me == owner[1]) {
             setAmIOwner(true)
         }
     }, [owner])
@@ -155,6 +161,18 @@ export default function Page({ params }) {
         };
     }, [params.id]); // Re-run the effect when `params.id` changes
 
+    useEffect(() => {
+        // Fetch video URL from the server when the component mounts
+        DefaultService.readVideoRoomRoomIdVideoGet(params.id).then((data) => {
+          if (data.url) {
+            // If video URL is retrieved successfully, set it in the state
+            setUrl(data.url);
+          } else {
+            console.error("Video URL not found");
+          }
+        });
+      }, [url, params.id]);
+
     if (!room) return (<div>Loading...</div>)
     if (!users) return (<div>Loading...</div>)
     if (!chat) return (<div>Loading...</div>)
@@ -183,10 +201,26 @@ export default function Page({ params }) {
                 {amIOwner && <div>I am owner</div>}
             </div>
 
-
             <hr></hr>
 
-
+            {amIOwner && (
+          <div>
+            <input
+              type="text"
+              value={inputUrl}
+              onChange={handleInputURLChange}
+              placeholder="Enter video URL"
+            />
+            <button
+              onClick={() => {
+                setUrl(inputUrl);
+                DefaultService.setVideoRoomRoomIdSetVideoVideoUrlUserIdPost(params.id, inputUrl, me);
+              }}
+            >
+              Play
+            </button>
+          </div>
+        )}
             <div className="flex justify-around">
                 <div>
                     Playback <br></br>
@@ -202,7 +236,7 @@ export default function Page({ params }) {
             </div>
 
             <ReactPlayer
-                url='https://www.youtube.com/watch?v=LXb3EKWsInQ'
+                url={url}
                 onPlay={() => {
                     console.log(" Setting play")
                     setAssumeLeader(true)
