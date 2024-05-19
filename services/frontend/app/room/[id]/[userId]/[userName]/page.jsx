@@ -259,12 +259,17 @@ export default function Page({ params }) {
             <div className="mt-5 flex flex-col items-center">
                 <input className="w-full" type="text" value={newMessage}
                     onChange={(event) => setNewMessage(event.target.value)}></input>
-                <button className="w-24" onClick={() => {
-                    setNewMessage('')
-                    DefaultServiceChat.addMessageRoomRoomIdAddMessageMessageUserNamePost(params.id, newMessage, userName).then((data) => {
-                        setChat(data.room)
-                    })
-                }}>Send
+                <button
+                    className="w-24"
+                    onClick={() => {
+                        setNewMessage('');
+                        DefaultServiceChat.addMessageRoomRoomIdAddMessageMessageUserNamePost(params.id, newMessage, userName).then((data) => {
+                            setChat(data.room);
+                        });
+                    }}
+                    disabled={!isPremium} //Chat only for premium users
+                >
+                    Send
                 </button>
             </div>
 
