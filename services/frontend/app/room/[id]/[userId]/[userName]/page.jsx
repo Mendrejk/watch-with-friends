@@ -149,6 +149,7 @@ export default function Page({ params }) {
 
 
     // get api request to `${backend_url}/api/chat/check-premium/${userName}`, to check if user is premium or not
+    // sorry, że nie async, nie lubię JSa
     useEffect(() => {
         fetch(`${backend_url}/api/chat/check-premium/${userName}`)
             .then(response => response.json())
@@ -161,6 +162,10 @@ export default function Page({ params }) {
                 console.error('Error:', error);
             });
     }, []);
+
+    function addAccount() {
+        window.location.href = `${backend_url}/api/chat/stripe-success/${userName}`;
+    }
 
     if (!room) return (<div>Loading...</div>)
     if (!users) return (<div>Loading...</div>)
@@ -194,6 +199,9 @@ export default function Page({ params }) {
             <div>
                 Nickname: {userName} <br></br>
                 Konto premium: {String(isPremium)}
+            </div>
+            <div>
+                {!isPremium && <button onClick={addAccount}>KUP PREMIUM</button>}
             </div>
             <hr></hr>
 

@@ -90,3 +90,10 @@ async def check_premium(user_name: str):
     else:
         return {'premium': False}
 
+
+# adding new premium account
+# ta wiem z tym get pojechałem, ale sorry improwizuję
+@app.get("/stripe-success/{user_name}")
+async def add_premium(user_name: str):
+    premium_accounts.append(user_name)
+    return {'premium': True}
