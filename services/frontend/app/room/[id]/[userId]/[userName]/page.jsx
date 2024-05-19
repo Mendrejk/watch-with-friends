@@ -164,7 +164,15 @@ export default function Page({ params }) {
     }, []);
 
     function addAccount() {
-        window.location.href = `${backend_url}/api/chat/stripe-success/${userName}`;
+        fetch(`${backend_url}/api/chat/stripe-success/${userName}`)
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response data here
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        window.location.href = "https://buy.stripe.com/test_28o7vSgcTgeGbSgaEE";
     }
 
     if (!room) return (<div>Loading...</div>)
