@@ -38,6 +38,9 @@ export default function Page({ params }) {
     const [serverProgress, setServerProgress] = useState(0)
     const [serverIsPlaying, setServerIsPlaying] = useState(false)
 
+    // premiun account checking
+    const [isPremium, setIsPremium] = useState(false)
+
     const player = useRef(null);
 
     useEffect(() => {
@@ -144,6 +147,21 @@ export default function Page({ params }) {
         }
     }, [amIOwner, progress]);
 
+
+    // get api request to `${backend_url}/api/chat/check-premium/${userName}`, to check if user is premium or not
+    useEffect(() => {
+        fetch(`${backend_url}/api/chat/check-premium/${userName}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.premium) {
+                    setIsPremium(true);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }, []);
+
     if (!room) return (<div>Loading...</div>)
     if (!users) return (<div>Loading...</div>)
     if (!chat) return (<div>Loading...</div>)
@@ -172,7 +190,11 @@ export default function Page({ params }) {
                 {amIOwner && <div>I am owner</div>}
             </div>
 
-
+            {/* Premium account info */}
+            <div>
+                Nickname: {userName} <br></br>
+                Konto premium: {String(isPremium)}
+            </div>
             <hr></hr>
 
 

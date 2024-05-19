@@ -78,3 +78,15 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
             messages = [(room.messages[x].user_name, room.messages[x].message) for x in range(len(room.messages))]
             await websocket.send_text(json.dumps(messages))
         await asyncio.sleep(0.1)
+
+
+# checking premium account
+premium_accounts = ['premium']
+
+@app.get("/check-premium/{user_name}")
+async def check_premium(user_name: str):
+    if user_name in premium_accounts:
+        return {'premium': True}
+    else:
+        return {'premium': False}
+
