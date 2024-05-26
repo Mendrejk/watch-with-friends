@@ -148,13 +148,13 @@ export default function Page({ params }) {
     }, [amIOwner, progress]);
 
 
-    // get api request to `${backend_url}/api/users/check-premium/${userName}`, to check if user is premium or not
-    // sorry, że nie async, nie lubię JSa
+    // get api request to check if user is premium or not
     useEffect(() => {
-        fetch(`${backend_url}/api/users/check-premium/${userName}`)
+        fetch(`${backend_url}/api/users/sessions/premium/${userName}`)
             .then(response => response.json())
             .then(data => {
-                if (data.premium) {
+                console.log(data);
+                if (data.premium === true) {
                     setIsPremium(true);
                 }
             })
