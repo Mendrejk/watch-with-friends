@@ -79,21 +79,3 @@ async def websocket_endpoint(websocket: WebSocket, room_id: str):
             await websocket.send_text(json.dumps(messages))
         await asyncio.sleep(0.1)
 
-
-# checking premium account
-premium_accounts = ['premium']
-
-@app.get("/check-premium/{user_name}")
-async def check_premium(user_name: str):
-    if user_name in premium_accounts:
-        return {'premium': True}
-    else:
-        return {'premium': False}
-
-
-# adding new premium account
-# ta wiem z tym get pojechałem, ale sorry improwizuję
-@app.get("/stripe-success/{user_name}")
-async def add_premium(user_name: str):
-    premium_accounts.append(user_name)
-    return {'premium': True}

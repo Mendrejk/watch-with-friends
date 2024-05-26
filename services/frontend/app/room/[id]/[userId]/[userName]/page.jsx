@@ -148,10 +148,10 @@ export default function Page({ params }) {
     }, [amIOwner, progress]);
 
 
-    // get api request to `${backend_url}/api/chat/check-premium/${userName}`, to check if user is premium or not
+    // get api request to `${backend_url}/api/users/check-premium/${userName}`, to check if user is premium or not
     // sorry, że nie async, nie lubię JSa
     useEffect(() => {
-        fetch(`${backend_url}/api/chat/check-premium/${userName}`)
+        fetch(`${backend_url}/api/users/check-premium/${userName}`)
             .then(response => response.json())
             .then(data => {
                 if (data.premium) {
@@ -164,7 +164,7 @@ export default function Page({ params }) {
     }, []);
 
     function addAccount() {
-        fetch(`${backend_url}/api/chat/stripe-success/${userName}`)
+        fetch(`${backend_url}/api/users/stripe-success/${userName}`)
             .then(response => response.json())
             .then(data => {
                 // Handle the response data here
