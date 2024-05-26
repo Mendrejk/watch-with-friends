@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stripe
+spec:
+  selector:
+    matchLabels:
+      app: stripe
+      tier: stripe
+      track: stable
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: stripe
+        tier: stripe
+        track: stable
+    spec:
+      containers:
+        - name: stripe
+          image: stripe/stripe-cli
+          command:
+            - "stripe"
+            - "listen"
+            - "--api-key"
+            - "sk_test_51PI7DGP8ndbnsTFPqpi6ijLXpXAT2Rz8HyeRUy3lLY2agXTFt6nKAVqUeWVAeHkNKsEbOQzIF8iCwo58ryi4KTRo00QGKiRZrM"
+            - "--device-name"
+            - "Device"
+            - "--forward-to"
+            - "users-service:80/api/users/stripe-webhook/"
+          env:
+            - name: STRIPE_API_KEY
+              value: "sk_test_51PI7DGP8ndbnsTFPqpi6ijLXpXAT2Rz8HyeRUy3lLY2agXTFt6nKAVqUeWVAeHkNKsEbOQzIF8iCwo58ryi4KTRo00QGKiRZrY"
+            - name: STRIPE_DEVICE_NAME
+              value: "Device"
+            - name: KAFKA_SERVER
+              value: kafka-service:9092
+            - name: KAFKA_GROUP_ID
+              value: stripe
+          ports:
+            - name: http
+              containerPort: 8000
+
+          imagePullPolicy: IfNotPresent

@@ -25,6 +25,9 @@ kubectl apply -f videos-db/videos-db.yaml
 kubectl apply -f videos-db/videos-db-service.yaml
 kubectl apply -f videos-db/videos-db-volume.yaml
 kubectl apply -f videos-db/videos-db-volume-claim.yaml
+
+kubectl apply -f stripe/stripe.yaml
+kubectl apply -f stripe/stripe-service.yaml
  
 kubectl apply -f zookeeper/zookeeper.yaml
 kubectl apply -f zookeeper/zookeeper-service.yaml

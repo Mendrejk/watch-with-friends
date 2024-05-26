@@ -23,3 +23,8 @@ services:
     image: frontend
     build:
       context: ./frontend
+
+  stripe:
+    image: stripe
+    build:
+      context: ./stripe
