@@ -32,23 +32,23 @@ async def read_item():
             cur.execute("""SELECT * FROM TestTable""")
             return {'test': cur.fetchall()}
         
-# checking premium account
-premium_accounts = ['premium']
+# # checking premium account
+# premium_accounts = ['premium']
 
-@app.get("/check-premium/{user_name}")
-async def check_premium(user_name: str):
-    if user_name in premium_accounts:
-        return {'premium': True}
-    else:
-        return {'premium': False}
+# @app.get("/check-premium/{user_name}")
+# async def check_premium(user_name: str):
+#     if user_name in premium_accounts:
+#         return {'premium': True}
+#     else:
+#         return {'premium': False}
 
 
-# adding new premium account
-# ta wiem z tym get pojechałem, ale sorry improwizuję
-@app.get("/stripe-success/{user_name}")
-async def add_premium(user_name: str):
-    premium_accounts.append(user_name)
-    return {'premium': True}
+# # adding new premium account
+# # ta wiem z tym get pojechałem, ale sorry improwizuję
+# @app.get("/stripe-success/{user_name}")
+# async def add_premium(user_name: str):
+#     premium_accounts.append(user_name)
+#     return {'premium': True}
 
 
 # Lista do przechowywania informacji o sesjach i użytkownikach
@@ -57,8 +57,9 @@ sessions = []
 
 class PaymentData(BaseModel):
     login: str
-    price_id: str
+    price_id: str = "price_1PI7aqP8ndbnsTFP2hkb9Pgd"
     quantity: int = 1
+    room_url: str
 
 
 @app.post("/create-checkout-session/")
@@ -72,8 +73,8 @@ async def create_checkout_session(payment_data: PaymentData):
                 'quantity': payment_data.quantity,
             }],
             mode='payment',
-            success_url='https://your-domain.com/success?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url='https://your-domain.com/cancel',
+            success_url= payment_data.room_url,
+            cancel_url=payment_data.room_url,
         )
 
         # Zapisywanie informacji o sesji i loginu w liście
@@ -115,3 +116,11 @@ async def handle_checkout_session(session):
 @app.get("/sessions/")
 async def get_sessions():
     return JSONResponse(status_code=200, content=sessions)
+
+@app.get("/sessions/premium/{login}")
+async def check_premium_status(login: str):
+    for record in sessions:
+        if record["login"] == login:
+            return JSONResponse(status_code=200, content={"premium": record["premium"]})
+
+    return JSONResponse(status_code=404, content={"message": "User not found"})
