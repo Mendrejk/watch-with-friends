@@ -163,17 +163,45 @@ export default function Page({ params }) {
             });
     }, []);
 
+    // function addAccount() {
+    //     fetch(`${backend_url}/api/users/stripe-success/${userName}`)
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             // Handle the response data here
+    //         })
+    //         .catch(error => {
+    //             console.error('Error:', error);
+    //         });
+    //     window.location.href = "https://buy.stripe.com/test_28o7vSgcTgeGbSgaEE";
+    // }
+
     function addAccount() {
-        fetch(`${backend_url}/api/users/stripe-success/${userName}`)
-            .then(response => response.json())
-            .then(data => {
-                // Handle the response data here
+        const currentUrl = window.location.href;
+    
+        fetch(`${backend_url}/api/users/create-checkout-session/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                login: userName,
+                room_url: currentUrl
             })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        window.location.href = "https://buy.stripe.com/test_28o7vSgcTgeGbSgaEE";
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.checkout_url) {
+                window.location.href = data.checkout_url;
+            } else {
+                console.error('Unexpected response format:', data);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
     }
+    
+
 
     if (!room) return (<div>Loading...</div>)
     if (!users) return (<div>Loading...</div>)
