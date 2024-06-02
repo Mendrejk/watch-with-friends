@@ -97,10 +97,11 @@ async def set_video(room_id: str, video_url: str, user_id: str):
     # TODO no video metadata is set
     room = repository.get_room(room_id)
 
-    if room.owner[0] != user_id:
-        return {'error': 'Only owner can set video'}
+    # if room.owner[0] != user_id:
+    #     return {'error': 'Only owner can set video'}
 
     room.video = Video(url=video_url, length=0, progress=0)
+    room.status = RoomStatus.PAUSED
 
     await kafka_handler.send_one('main_topic', ('video_set', room_id, video_url))
     return {'room': room}
@@ -150,7 +151,7 @@ async def websocket_endpoint(websocket: WebSocket):
     while True:
         rooms = repository.get_rooms()
         # Extract statues from rooms
-        rooms = {room_id: (room.video.progress, room.status.value)  for room_id, room in rooms.items()}
+        rooms = {room_id: (room.video.progress, room.status.value, room.video.url) for room_id, room in rooms.items()}
         await websocket.send_text(json.dumps(rooms))
         await asyncio.sleep(0.1)
     
