@@ -24,7 +24,7 @@ services:
     build:
       context: ./frontend
 
-  stripe:
-    image: stripe
-    build:
-      context: ./stripe
+#  stripe:
+#    image: stripe
+#    build:
+#      context: ./stripe

@@ -27,7 +27,6 @@ kubectl delete -f videos-db/videos-db-volume.yaml
 kubectl delete -f videos-db/videos-db-volume-claim.yaml
 
 kubectl delete -f stripe/stripe.yaml
-kubectl delete -f stripe/stripe-service.yaml
 
 kubectl delete -f zookeeper/zookeeper.yaml
 kubectl delete -f zookeeper/zookeeper-service.yaml
