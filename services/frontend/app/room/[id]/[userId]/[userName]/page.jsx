@@ -1,19 +1,19 @@
 'use client'
 
-import { useEffect, useRef, useState } from "react";
-import { DefaultService } from "@/services/openapi/rooms"
-import { OpenAPI } from "@/services/openapi/rooms"
+import {useEffect, useRef, useState} from "react";
+import {DefaultService} from "@/services/openapi/rooms"
+import {OpenAPI} from "@/services/openapi/rooms"
 import React from "react";
 import ReactPlayer from 'react-player'
-import { backend_url, backend_ws_url } from "@/app/backend";
+import {backend_url, backend_ws_url} from "@/app/backend";
 
-import { DefaultService as DefaultServiceChat } from "@/services/openapi/chat"
-import { OpenAPI as OpenAPIChat } from "@/services/openapi/chat"
+import {DefaultService as DefaultServiceChat} from "@/services/openapi/chat"
+import {OpenAPI as OpenAPIChat} from "@/services/openapi/chat"
 
 OpenAPI.BASE = `${backend_url}/api/rooms`
 OpenAPIChat.BASE = `${backend_url}/api/chat`
 
-export default function Page({ params }) {
+export default function Page({params}) {
 
     let ws = null;
     let chat_ws = null;
@@ -29,6 +29,7 @@ export default function Page({ params }) {
     const [newMessage, setNewMessage] = useState('')
 
     const [url, setUrl] = useState('')
+    const [inputUrl, setInputUrl] = useState('');
 
     const [isPlaying, setIsPlaying] = useState(false)
     const [assumeLeader, setAssumeLeader] = useState(false)
@@ -38,10 +39,15 @@ export default function Page({ params }) {
     const [serverProgress, setServerProgress] = useState(0)
     const [serverIsPlaying, setServerIsPlaying] = useState(false)
 
-    // premiun account checking
+    // premium account checking
     const [isPremium, setIsPremium] = useState(false)
 
     const player = useRef(null);
+
+
+    const handleInputURLChange = (event) => {
+        setInputUrl(event.target.value);
+    };
 
     useEffect(() => {
         DefaultService.readRoomRoomRoomIdGet(params.id).then((data) => {
@@ -73,6 +79,10 @@ export default function Page({ params }) {
             if (myRoom) {
                 setServerIsPlaying(myRoom[1] === "PLAYING")
                 setServerProgress(myRoom[0])
+
+                if (url !== myRoom[2]) {
+                    setUrl(decodeURIComponent(myRoom[2]))
+                }
             }
         });
 
@@ -114,7 +124,7 @@ export default function Page({ params }) {
     }, [player, amIOwner, progress, serverProgress, isPlaying, serverIsPlaying, assumeLeader])
 
     useEffect(() => {
-        if (me == owner[0]) {
+        if (me === owner[0]) {
             setAmIOwner(true)
         }
     }, [owner])
@@ -177,7 +187,7 @@ export default function Page({ params }) {
 
     function addAccount() {
         const currentUrl = window.location.href;
-    
+
         fetch(`${backend_url}/api/users/create-checkout-session/`, {
             method: 'POST',
             headers: {
@@ -188,20 +198,31 @@ export default function Page({ params }) {
                 room_url: currentUrl
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data && data.checkout_url) {
-                window.location.href = data.checkout_url;
-            } else {
-                console.error('Unexpected response format:', data);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.checkout_url) {
+                    window.location.href = data.checkout_url;
+                } else {
+                    console.error('Unexpected response format:', data);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
     }
-    
 
+
+    useEffect(() => {
+        // Fetch video URL from the server when the component mounts
+        DefaultService.readVideoRoomRoomIdVideoGet(params.id).then((data) => {
+            if (data.video.url) {
+                // If video URL is retrieved successfully, set it in the state
+                setUrl(data.video.url);
+            } else {
+                console.error("Video URL not found");
+            }
+        });
+    }, [params.id]);
 
     if (!room) return (<div>Loading...</div>)
     if (!users) return (<div>Loading...</div>)
@@ -241,7 +262,24 @@ export default function Page({ params }) {
             </div>
             <hr></hr>
 
-
+            {amIOwner && (
+                <div>
+                    <input
+                        type="text"
+                        value={inputUrl}
+                        onChange={handleInputURLChange}
+                        placeholder="Enter video URL"
+                    />
+                    <button
+                        onClick={() => {
+                            setUrl(inputUrl);
+                            DefaultService.setVideoRoomRoomIdSetVideoVideoUrlUserIdPost(params.id, encodeURIComponent(inputUrl), me);
+                        }}
+                    >
+                        Set
+                    </button>
+                </div>
+            )}
             <div className="flex justify-around">
                 <div>
                     Playback <br></br>
@@ -257,7 +295,7 @@ export default function Page({ params }) {
             </div>
 
             <ReactPlayer
-                url='https://www.youtube.com/watch?v=LXb3EKWsInQ'
+                url={url ? url : ""}
                 onPlay={() => {
                     console.log(" Setting play")
                     setAssumeLeader(true)
@@ -286,7 +324,7 @@ export default function Page({ params }) {
 
             <div className="mt-5 flex flex-col items-center">
                 <input className="w-full" type="text" value={newMessage}
-                    onChange={(event) => setNewMessage(event.target.value)}></input>
+                       onChange={(event) => setNewMessage(event.target.value)}></input>
                 <button
                     className="w-24"
                     onClick={() => {
