@@ -4,8 +4,8 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { DefaultService } from "../services/openapi/rooms";
-import { OpenAPI } from "../services/openapi/rooms";
+import { DefaultService } from "@/services/openapi/rooms";
+import { OpenAPI } from "@/services/openapi/rooms";
 import { useRouter } from 'next/navigation';
 import { backend_url } from "@/app/backend";
 OpenAPI.BASE = `${backend_url}/api/rooms`;
@@ -15,6 +15,7 @@ export default function Home() {
   const [rooms, setRooms] = useState(null);
   const [isLoading, setLoading] = useState(true);
   const [userName, setUserName] = useState("");
+  const userId = crypto.randomUUID().toString();
   const [userRole, setUserRole] = useState("NewUser");
 
   useEffect(() => {
@@ -36,13 +37,13 @@ export default function Home() {
 
   let onActionRoom = (name, role) => {
     if (role === "Admin") {
-      DefaultService.createRoomCreateRoomRoomNameOwnerNamePost(name, userName).then((response) => {
+      DefaultService.createRoomCreateRoomRoomNameOwnerNamePost(name, userName, userId).then((response) => {
         const roomId = response.room.id;
-        router.push(`/room/${roomId}/${userName}`);
+        router.push(`/room/${roomId}/${userId}/${userName}`);
       }).catch((error) => {
         console.error("Error creating room:", error);
       });
-    } 
+    }
   }
 
   const isNameEmpty = userName.trim() === "";
@@ -68,7 +69,7 @@ export default function Home() {
 
       {(userRole === "User") && (
         <div className="w-full max-w-md p-4">
-          <RoomList rooms={rooms} onRoomClick={(room) => { router.push(`/room/${room.id}/${userName}`) }} />
+          <RoomList rooms={rooms} onRoomClick={(room) => { router.push(`/room/${room.id}/${userId}/${userName}`) }} />
         </div>
       )}
 

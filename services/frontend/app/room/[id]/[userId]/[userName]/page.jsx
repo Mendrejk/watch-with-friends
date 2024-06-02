@@ -18,7 +18,8 @@ export default function Page({ params }) {
     let ws = null;
     let chat_ws = null;
 
-    const [me, setMe] = useState(params.user)
+    const me = params.userId
+    const userName = params.userName
     const [room, setRoom] = useState(null)
     const [users, setUsers] = useState([])
     const [chat, setChat] = useState([])
@@ -37,6 +38,9 @@ export default function Page({ params }) {
 
     const [serverProgress, setServerProgress] = useState(0)
     const [serverIsPlaying, setServerIsPlaying] = useState(false)
+
+    // premium account checking
+    const [isPremium, setIsPremium] = useState(false)
 
     const player = useRef(null);
 
@@ -81,13 +85,20 @@ export default function Page({ params }) {
 
         chat_ws = new WebSocket(`${backend_ws_url}/api/chat/ws/${params.id}`);
         chat_ws.addEventListener("message", (event) => {
-            let chat = JSON.parse(event.data)
+            let chat_object = JSON.parse(event.data)
             let messages = []
-            for (let i = 0; i < chat.size; i++) {
-                messages.push(chat[i])
+            for (let i = 0; i < chat_object.length; i++) {
+                let message_array = chat_object[i]
+                messages.push({
+                    user_name: message_array[0],
+                    message: message_array[1]
+                })
             }
-            // setChat(chat)
-            // console.log(typeof(chat))
+            let chat = {
+                id: 'todo',
+                messages: messages
+            }
+            setChat(chat)
         });
     }, [])
 
@@ -142,24 +153,61 @@ export default function Page({ params }) {
         }
     }, [amIOwner, progress]);
 
+
+    // get api request to check if user is premium or not
     useEffect(() => {
-        const interval = setInterval(() => {
-            DefaultServiceChat.readRoomRoomRoomIdGet(params.id).then((data) => {
-                if (data.room) {
-                    setChat(data.room)
-                } else {
-                    DefaultServiceChat.createRoomCreateRoomRoomIdPost(params.id).then((data) => {
-                        setChat(data.room)
-                    })
+        fetch(`${backend_url}/api/users/sessions/premium/${userName}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.premium === true) {
+                    setIsPremium(true);
                 }
             })
-        }, 100); // Fetch chat messages every 100ms
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }, []);
 
-        // Clean up function
-        return () => {
-            clearInterval(interval);
-        };
-    }, [params.id]); // Re-run the effect when `params.id` changes
+    // function addAccount() {
+    //     fetch(`${backend_url}/api/users/stripe-success/${userName}`)
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             // Handle the response data here
+    //         })
+    //         .catch(error => {
+    //             console.error('Error:', error);
+    //         });
+    //     window.location.href = "https://buy.stripe.com/test_28o7vSgcTgeGbSgaEE";
+    // }
+
+    function addAccount() {
+        const currentUrl = window.location.href;
+    
+        fetch(`${backend_url}/api/users/create-checkout-session/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                login: userName,
+                room_url: currentUrl
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.checkout_url) {
+                window.location.href = data.checkout_url;
+            } else {
+                console.error('Unexpected response format:', data);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+    
+
 
     useEffect(() => {
         // Fetch video URL from the server when the component mounts
@@ -201,6 +249,14 @@ export default function Page({ params }) {
                 {amIOwner && <div>I am owner</div>}
             </div>
 
+            {/* Premium account info */}
+            <div>
+                Nickname: {userName} <br></br>
+                Konto premium: {String(isPremium)}
+            </div>
+            <div>
+                {!isPremium && <button onClick={addAccount}>KUP PREMIUM</button>}
+            </div>
             <hr></hr>
 
             {amIOwner && (
@@ -266,12 +322,17 @@ export default function Page({ params }) {
             <div className="mt-5 flex flex-col items-center">
                 <input className="w-full" type="text" value={newMessage}
                     onChange={(event) => setNewMessage(event.target.value)}></input>
-                <button className="w-24" onClick={() => {
-                    setNewMessage('')
-                    DefaultServiceChat.addMessageRoomRoomIdAddMessageMessageUserNamePost(params.id, newMessage, me).then((data) => {
-                        setChat(data.room)
-                    })
-                }}>Send
+                <button
+                    className="w-24"
+                    onClick={() => {
+                        setNewMessage('');
+                        DefaultServiceChat.addMessageRoomRoomIdAddMessageMessageUserNamePost(params.id, newMessage, userName).then((data) => {
+                            setChat(data.room);
+                        });
+                    }}
+                    disabled={!isPremium} //Chat only for premium users
+                >
+                    Send
                 </button>
             </div>
 
