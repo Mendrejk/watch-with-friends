@@ -38,6 +38,9 @@ export default function Page({ params }) {
     const [serverProgress, setServerProgress] = useState(0)
     const [serverIsPlaying, setServerIsPlaying] = useState(false)
 
+    // premiun account checking
+    const [isPremium, setIsPremium] = useState(false)
+
     const player = useRef(null);
 
     useEffect(() => {
@@ -144,6 +147,62 @@ export default function Page({ params }) {
         }
     }, [amIOwner, progress]);
 
+
+    // get api request to check if user is premium or not
+    useEffect(() => {
+        fetch(`${backend_url}/api/users/sessions/premium/${userName}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.premium === true) {
+                    setIsPremium(true);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }, []);
+
+    // function addAccount() {
+    //     fetch(`${backend_url}/api/users/stripe-success/${userName}`)
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             // Handle the response data here
+    //         })
+    //         .catch(error => {
+    //             console.error('Error:', error);
+    //         });
+    //     window.location.href = "https://buy.stripe.com/test_28o7vSgcTgeGbSgaEE";
+    // }
+
+    function addAccount() {
+        const currentUrl = window.location.href;
+    
+        fetch(`${backend_url}/api/users/create-checkout-session/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                login: userName,
+                room_url: currentUrl
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.checkout_url) {
+                window.location.href = data.checkout_url;
+            } else {
+                console.error('Unexpected response format:', data);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+    
+
+
     if (!room) return (<div>Loading...</div>)
     if (!users) return (<div>Loading...</div>)
     if (!chat) return (<div>Loading...</div>)
@@ -172,7 +231,14 @@ export default function Page({ params }) {
                 {amIOwner && <div>I am owner</div>}
             </div>
 
-
+            {/* Premium account info */}
+            <div>
+                Nickname: {userName} <br></br>
+                Konto premium: {String(isPremium)}
+            </div>
+            <div>
+                {!isPremium && <button onClick={addAccount}>KUP PREMIUM</button>}
+            </div>
             <hr></hr>
 
 
@@ -221,12 +287,17 @@ export default function Page({ params }) {
             <div className="mt-5 flex flex-col items-center">
                 <input className="w-full" type="text" value={newMessage}
                     onChange={(event) => setNewMessage(event.target.value)}></input>
-                <button className="w-24" onClick={() => {
-                    setNewMessage('')
-                    DefaultServiceChat.addMessageRoomRoomIdAddMessageMessageUserNamePost(params.id, newMessage, userName).then((data) => {
-                        setChat(data.room)
-                    })
-                }}>Send
+                <button
+                    className="w-24"
+                    onClick={() => {
+                        setNewMessage('');
+                        DefaultServiceChat.addMessageRoomRoomIdAddMessageMessageUserNamePost(params.id, newMessage, userName).then((data) => {
+                            setChat(data.room);
+                        });
+                    }}
+                    disabled={!isPremium} //Chat only for premium users
+                >
+                    Send
                 </button>
             </div>
 
