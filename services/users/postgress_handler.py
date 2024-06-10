@@ -26,15 +26,15 @@ def connect_to_db():
 #             person VARCHAR(255) NOT NULL,
 #             not_person VARCHAR(255) NOT NULL)""")
 
-# def add_demo_data():
-#     with psycopg2.connect(database=postgres_database,
-#                           host=postgress_host,
-#                           user=postgress_user,
-#                           password=postgress_password,
-#                           port=postgres_port) as conn:
-#         with conn.cursor() as cur:
-#             id = uuid.uuid4()
-#             cur.execute("INSERT INTO TestTable(id, person, not_person) VALUES (%s, 'Seba', 'tutturu')", (id,))
+def add_demo_data():
+    with psycopg2.connect(database=postgres_database,
+                          host=postgress_host,
+                          user=postgress_user,
+                          password=postgress_password,
+                          port=postgres_port) as conn:
+        with conn.cursor() as cur:
+            id = uuid.uuid4()
+            cur.execute("INSERT INTO TestTable(id, person, not_person) VALUES (%s, 'Seba', 'tutturu')", (id,))
 
 def init_db():
     with connect_to_db() as conn:

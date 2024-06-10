@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { DefaultService } from "@/services/openapi/rooms";
+import { DefaultService } from "@/services/openapi/rooms"; // Import DefaultService from rooms
+import { DefaultService as UserDefaultService } from "@/services/openapi/users"; // Import DefaultService from users
 import { OpenAPI } from "@/services/openapi/rooms";
 import { useRouter } from 'next/navigation';
 import { backend_url } from "@/app/backend";
+
 OpenAPI.BASE = `${backend_url}/api/rooms`;
 
 export default function Home() {
@@ -63,36 +65,44 @@ export default function Home() {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch(`${backend_url}/api/users/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: formData.username, password: formData.password }),
-      });
-      const data = await response.json();
-      if (response.ok) {
+      console.log('form status:', formData);
+
+      const requestBody = { username: formData.username, password: formData.password };
+      const response = await UserDefaultService.loginLoginPost(requestBody);
+  
+      console.log('Login response:', response); // Log the entire response object
+  
+      if (response.username) {
         setIsAuthenticated(true);
-        setUserName(formData.username);
-        // setUserId(data.user_id); // Assuming user_id is returned in response
+        setUserName(response.username);
+        // Assuming response contains a user_id field if needed
+        setUserId(response.user_id);
       } else {
-        console.error(data.detail);
+        console.error("Login failed: Unknown error");
       }
     } catch (error) {
-      console.error("Login error:", error);
+      if (error.status === 401) {
+        console.error("Login failed: Incorrect username or password");
+      } else {
+        console.error("Login error:", error);
+      }
     }
   };
-  
+
   const handleRegister = async () => {
     try {
-      const response = await fetch(`${backend_url}/api/users/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setIsLoginForm(true);
+      const requestBody = { username: formData.username, password: formData.password };
+      const response = await UserDefaultService.registerRegisterPost(requestBody);
+  
+      if (response) {
+        // Assuming the response object has a property to indicate success
+        setIsLoginForm(true); // Switch to login form after successful registration
+      } else if (response.status === 422) {
+        const errorData = await response.json();
+        console.error("Validation Error:", errorData);
       } else {
-        console.error(data.detail);
+        const errorText = await response.text();
+        console.error("Registration failed:", errorText);
       }
     } catch (error) {
       console.error("Registration error:", error);
